@@ -71,6 +71,12 @@ namespace UnitySteer.Behaviors
         }
 
         /// <summary>
+        /// Allows some logic to handle a looping path, value will be set by the controller
+        /// </summary>
+        [HideInInspector]
+        public bool isLooping = false;
+
+        /// <summary>
         /// Path to follow
         /// </summary>
         public IPathway Path
@@ -84,6 +90,17 @@ namespace UnitySteer.Behaviors
         }
 
         #endregion
+
+        public void Start(){
+            base.Start();
+            Debug.Log("Steer for path Simp Awakon");
+            Debug.Log("Path Length: ");
+            float startPos = Random.value * Path.TotalPathLength;
+            DistanceAlongPath = startPos;
+            Vector3 point = Path.MapPathDistanceToPoint(startPos);
+            transform.position = point;
+            
+        }
 
         /// <summary>
         /// Should the force be calculated?
@@ -152,6 +169,13 @@ namespace UnitySteer.Behaviors
 			 * arrival radius so that it can continue moving.
 			 */
                 target = Path.MapPathDistanceToPoint(targetPathDistance + 2f * Vehicle.ArrivalRadius);
+                seek = Vehicle.GetSeekVector(target);
+            /*
+            If the path is looping we recalculate the posiiton on path to loop the paths
+            */
+            }else if(isLooping && targetPathDistance >= Path.TotalPathLength){
+
+                target = Path.MapPathDistanceToPoint( targetPathDistance - Path.TotalPathLength );
                 seek = Vehicle.GetSeekVector(target);
             }
 
